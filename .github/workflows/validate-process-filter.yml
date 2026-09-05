@@ -1,0 +1,32 @@
+name: Validate process suggestion filtering
+on:
+  push:
+    branches: [ci/validate-process-filter]
+permissions:
+  contents: read
+jobs:
+  windows-build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Build unchanged baseline
+        run: dotnet build WindowsAutoDarkMode.slnx -c Debug -p:Platform=x64
+      - name: Apply candidate patch in runner workspace
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("candidate.patch", [Convert]::FromBase64String("ZGlmZiAtLWdpdCBhL0F1dG9EYXJrTW9kZUFwcC9WaWV3cy9Db25kaXRpb25zUGFnZS54YW1sIGIvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwKaW5kZXggYWI5ZmJlZi4uNjVlMDUzMCAxMDA2NDQKLS0tIGEvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwKKysrIGIvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwKQEAgLTYyLDYgKzYyLDcgQEAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUXVlcnlJY29uPSJ7dWk6Rm9udEljb25Tb3VyY2UgR2x5cGg9JiN4RTcxMDssCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEZvbnRTaXplPTEyfSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU3VnZ2VzdGVkSXRlbXNTb3VyY2U9Int4OkJpbmQgVmlld01vZGVsLlByb2Nlc3NMaXN0SXRlbVNvdXJjZSwgTW9kZT1PbmVXYXl9IgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUZXh0Q2hhbmdlZD0iUHJvY2Vzc1Rva2VuaXppbmdUZXh0Qm94X1RleHRDaGFuZ2VkIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUb2tlbkRlbGltaXRlcj0iLCIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVG9rZW5JdGVtQWRkZWQ9IlByb2Nlc3NUb2tlbml6aW5nVGV4dEJveF9Ub2tlbkl0ZW1DaGFuZ2VkIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUb2tlbkl0ZW1SZW1vdmVkPSJQcm9jZXNzVG9rZW5pemluZ1RleHRCb3hfVG9rZW5JdGVtQ2hhbmdlZCIgLz4KZGlmZiAtLWdpdCBhL0F1dG9EYXJrTW9kZUFwcC9WaWV3cy9Db25kaXRpb25zUGFnZS54YW1sLmNzIGIvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwuY3MKaW5kZXggZTlkMTBjNy4uMDA5NWY2MiAxMDA2NDQKLS0tIGEvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwuY3MKKysrIGIvQXV0b0RhcmtNb2RlQXBwL1ZpZXdzL0NvbmRpdGlvbnNQYWdlLnhhbWwuY3MKQEAgLTUyLDYgKzUyLDE3IEBAIHB1YmxpYyBzZWFsZWQgcGFydGlhbCBjbGFzcyBDb25kaXRpb25zUGFnZSA6IFBhZ2UKICAgICAgICAgfQogICAgIH0KIAorICAgIHByaXZhdGUgdm9pZCBQcm9jZXNzVG9rZW5pemluZ1RleHRCb3hfVGV4dENoYW5nZWQoQXV0b1N1Z2dlc3RCb3ggc2VuZGVyLCBBdXRvU3VnZ2VzdEJveFRleHRDaGFuZ2VkRXZlbnRBcmdzIGFyZ3MpCisgICAgeworICAgICAgICBpZiAoYXJncy5SZWFzb24gIT0gQXV0b1N1Z2dlc3Rpb25Cb3hUZXh0Q2hhbmdlUmVhc29uLlVzZXJJbnB1dCkKKyAgICAgICAgICAgIHJldHVybjsKKworICAgICAgICBzZW5kZXIuSXRlbXNTb3VyY2UgPSBWaWV3TW9kZWwuUHJvY2Vzc0xpc3RJdGVtU291cmNlPworICAgICAgICAgICAgLldoZXJlKHByb2Nlc3MgPT4gcHJvY2Vzcy5Db250YWlucyhzZW5kZXIuVGV4dCwgU3RyaW5nQ29tcGFyaXNvbi5PcmRpbmFsSWdub3JlQ2FzZSkKKyAgICAgICAgICAgICAgICAmJiBWaWV3TW9kZWwuUHJvY2Vzc0Jsb2NrTGlzdEl0ZW1Tb3VyY2U/LkNvbnRhaW5zKHByb2Nlc3MpICE9IHRydWUpCisgICAgICAgICAgICAuVG9MaXN0KCk7CisgICAgfQorCiAgICAgcHJpdmF0ZSB2b2lkIFByb2Nlc3NUb2tlbml6aW5nVGV4dEJveF9Ub2tlbkl0ZW1DaGFuZ2VkKENvbW11bml0eVRvb2xraXQuV2luVUkuQ29udHJvbHMuVG9rZW5pemluZ1RleHRCb3ggc2VuZGVyLCBvYmplY3QgYXJncykKICAgICB7CiAgICAgICAgIGlmIChWaWV3TW9kZWwuUHJvY2Vzc0Jsb2NrTGlzdEl0ZW1Tb3VyY2UgPT0gbnVsbCkK"))
+          git apply --check candidate.patch
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git apply candidate.patch
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --check
+      - name: Build candidate
+        run: dotnet build WindowsAutoDarkMode.slnx -c Debug -p:Platform=x64 --no-restore
